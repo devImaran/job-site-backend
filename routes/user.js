@@ -1,0 +1,33 @@
+const express=require('express')
+const router=express.Router();
+const {registerController}=require('../controllers/user')
+const {userLoginController}=require('../controllers/user')
+const {showAllRegisteredHr}=require('../controllers/user')
+const {showAllRegisteredAdmins}=require('../controllers/user')
+const {showAllRegisteredUsers}=require('../controllers/user')
+const {showOneRegisteredUsers}=require('../controllers/user')
+const {updateRegisteredUsers}=require('../controllers/user')
+const {deleteRegisteredUsers}=require('../controllers/user')
+const {userAppliedJob}=require('../controllers/user')
+const {authenticate, hrMiddleware, adminMiddleware,superAdminMiddleware}=require('../common-middleware')
+const {userMiddleware}=require('../common-middleware')
+const {userChangePassword}=require('../controllers/user')
+const {signUpRequestValidator,signUpRequestValidatorResult,loginRequestValidator,loginRequestValidatorResult}=require('../validator')
+const {forgetPassword}=require('../controllers/user')
+const {resetPassword}=require('../controllers/user')
+
+router.post('/register/create',signUpRequestValidator,signUpRequestValidatorResult,registerController)
+router.post('/user/login',loginRequestValidator,loginRequestValidatorResult,userLoginController)
+
+router.put('/user/status/changePassword/:id',authenticate,userMiddleware,userChangePassword)
+router.put('/hr/changePassword/status/:id',authenticate,hrMiddleware,userChangePassword)
+router.get('/hr/registered/show/all',authenticate,superAdminMiddleware||adminMiddleware,showAllRegisteredHr)
+router.get('/admin/registered/show/all',authenticate,superAdminMiddleware,showAllRegisteredAdmins)
+router.get('/user/registered/show/all',authenticate,superAdminMiddleware||adminMiddleware,showAllRegisteredUsers)
+router.get('/show/onlyone/registered/user/:id',authenticate,superAdminMiddleware||adminMiddleware,showOneRegisteredUsers)
+router.put('/update/registered/user/:id',authenticate,updateRegisteredUsers)
+router.delete('/delete/registered/user/:id',authenticate,deleteRegisteredUsers)
+router.post('/reset/password',forgetPassword)
+router.post('/new-password/forget',resetPassword)
+
+module.exports=router;
